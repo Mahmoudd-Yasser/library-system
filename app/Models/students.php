@@ -4,11 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
 
 class students extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'student_id'];
+    use HasApiTokens;
+    protected $fillable = ['name', 'student_id','image'];
+    public function getImageUrlAttribute()
+    {
+        return $this->image ? asset('storage/' . $this->image) : null;
+    }
 
     public function borrows()
     {
