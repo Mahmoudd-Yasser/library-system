@@ -5,20 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class students extends Model
+class students extends Authenticatable
 {
     use HasFactory;
     use HasApiTokens;
-    protected $fillable = ['name', 'student_id','image'];
+    protected $fillable = ['name', 'student_id', 'image'];
     public function getImageUrlAttribute()
     {
-        return $this->image ? asset('storage/' . $this->image) : null;
+        if (!$this->image) {
+            return null;
+        }
+        // إزالة storage/ من بداية المسار إذا كانت موجودة
+        $path = str_replace('storage/', '', $this->image);
+        return asset('storage/' . $path);
     }
 
     public function borrows()
     {
-        return $this->hasMany(borrows::class);
+        return $this->hasMany(borrows::class, 'student_id');
     }
 
     public function qrLogs()
@@ -28,6 +34,6 @@ class students extends Model
 
     public function books()
     {
-        return $this->belongsToMany(books::class, 'book_student');
+        return $this->belongsToMany(books::class, 'book_student', 'student_id', 'book_id');
     }
 }

@@ -85,14 +85,37 @@ class studentsController extends Controller
      *     )
      * )
      */
-    public function show(students $student)
+    public function show($id)
     {
+        $student = students::findOrFail($id);
+        $imagePath = $student->image;
+        
+        // إزالة storage/ من بداية المسار إذا كانت موجودة
+        $cleanPath = str_replace('storage/', '', $imagePath);
+        
+        $fullPath = storage_path('app/public/' . $cleanPath);
+        $publicPath = public_path('storage/' . $cleanPath);
+        
+        \Log::info('Student Image Debug:', [
+            'image_path' => $imagePath,
+            'clean_path' => $cleanPath,
+            'full_path' => $fullPath,
+            'public_path' => $publicPath,
+            'exists' => file_exists($fullPath)
+        ]);
+
         return response()->json([
             'id' => $student->id,
             'name' => $student->name,
             'student_id' => $student->student_id,
-            'image' => $student->image ? url('storage/' . $student->image) : null
-        ], 200, [], JSON_UNESCAPED_UNICODE);
+            'image' => $imagePath ? asset('storage/' . $cleanPath) : null,
+            'debug' => [
+                'image_path' => $imagePath,
+                'clean_path' => $cleanPath,
+                'full_path' => $fullPath,
+                'public_path' => $publicPath,
+                'exists' => file_exists($fullPath)
+            ]
+        ]);
     }
-    
 }
