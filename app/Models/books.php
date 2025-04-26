@@ -9,7 +9,12 @@ class books extends Model
 {
     use HasFactory;
     public $timestamps = false;
-    protected $fillable = ['title', 'quantity', 'publish_year', 'category_id', 'qr_code','file'];
+    protected $fillable = ['title', 'quantity', 'publish_year', 'category_id', 'qr_code', 'file'];
+    
+    // Set default value for qr_code if not provided
+    protected $attributes = [
+        'qr_code' => null
+    ];
 
     public function category()
     {
@@ -23,12 +28,12 @@ class books extends Model
 
     public function students()
     {
-        return $this->belongsToMany(students::class, 'book_student', 'book_id', 'student_id');
+        return $this->belongsToMany(Student::class, 'book_student', 'book_id', 'student_id');
     }
 
     public function borrows()
     {
-        return $this->hasMany(borrows::class);
+        return $this->hasMany(Borrow::class);
     }
 
     public function getCategoryImageAttribute()

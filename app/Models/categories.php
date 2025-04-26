@@ -9,20 +9,17 @@ class categories extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'image'];
+    public $timestamps = false;
 
-    public function getImageUrlAttribute()
-    {
-        if (!$this->image) {
-            return null;
-        }
-        // إزالة storage/ من بداية المسار إذا كانت موجودة
-        $path = str_replace('storage/', '', $this->image);
-        return asset('storage/' . $path);
-    }
+    protected $fillable = ['name', 'image'];
 
     public function books()
     {
         return $this->hasMany(books::class, 'category_id');
+    }
+
+    public function getImageUrlAttribute()
+    {
+        return $this->image ? asset('storage/' . $this->image) : null;
     }
 }
